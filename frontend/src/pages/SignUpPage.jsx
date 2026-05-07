@@ -28,9 +28,7 @@ function SignUpPage() {
                 {/* HEADING TEXT */}
                 <div className="text-center mb-8">
                   <MessageCircleIcon className="w-12 h-12 mx-auto text-slate-400 mb-4" />
-                  <h2 className="text-2xl font-bold text-slate-200 mb-2">
-                    Create Account
-                  </h2>
+                  <h2 className="text-2xl font-bold text-slate-200 mb-2">Create Account</h2>
                   <p className="text-slate-400">Sign up for a new account</p>
                 </div>
 
@@ -45,9 +43,7 @@ function SignUpPage() {
                       <input
                         type="text"
                         value={formData.fullName}
-                        onChange={(e) =>
-                          setformData({ ...formData, fullName: e.target.value })
-                        }
+                        onChange={(e) => setformData({ ...formData, fullName: e.target.value })}
                         className="input"
                         placeholder="Full Name"
                       />
@@ -63,9 +59,7 @@ function SignUpPage() {
                       <input
                         type="email"
                         value={formData.email}
-                        onChange={(e) =>
-                          setformData({ ...formData, email: e.target.value })
-                        }
+                        onChange={(e) => setformData({ ...formData, email: e.target.value })}
                         className="input"
                         placeholder="Email Id"
                       />
@@ -81,25 +75,15 @@ function SignUpPage() {
                       <input
                         type="password"
                         value={formData.password}
-                        onChange={(e) =>
-                          setformData({ ...formData, password: e.target.value })
-                        }
+                        onChange={(e) => setformData({ ...formData, password: e.target.value })}
                         className="input"
                         placeholder="Password"
                       />
                     </div>
                   </div>
                   {/* SUBMIT BUTTON */}
-                  <button
-                    className="auth-btn"
-                    type="submit"
-                    disabled={isSigningUp}
-                  >
-                    {isSigningUp ? (
-                      <LoaderIcon className="w-full h-5 animate-spin text center" />
-                    ) : (
-                      "Create Account"
-                    )}
+                  <button className="auth-btn" type="submit" disabled={isSigningUp}>
+                    {isSigningUp ? <LoaderIcon className="w-full h-5 animate-spin text center" /> : "Create Account"}
                   </button>
                 </form>
 
@@ -114,11 +98,7 @@ function SignUpPage() {
             {/* FORM ILLUSTRATION -RIGHT SIDE */}
             <div className="hidden md:w-1/2 md:flex items-center justify-center p-6 bg-gradient-to-bl from-slate-800/20 to-transparent">
               <div>
-                <img
-                  src="/signup.png"
-                  alt="People using mobile devices"
-                  className="w-full h-auto object-contain"
-                />
+                <img src="/signup.png" alt="People using mobile devices" className="w-full h-auto object-contain" />
                 <div className="mt-6 text-center">
                   <h3 className="text-lg font-medium text-cyan-400">Start Your Journey Today</h3>
 
