@@ -9,11 +9,32 @@ import PageLoader from "./components/PageLoader";
 import { Toaster } from "react-hot-toast";
 
 function App() {
-  const { checkAuth, isCheckingAuth, authUser } = useAuthStore();
+  const { checkAuth, isCheckingAuth, authUser, socket } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleEmergency = (data) => {
+      const { senderName, location } = data;
+      const mapsLink = `https://www.google.com/maps?q=${location.latitude},${location.longitude}`;
+      
+      toast.error(
+        <div>
+          <p className="font-bold text-lg text-red-600">EMERGENCY ALERT</p>
+          <p>{senderName} needs help!</p>
+          <a href={mapsLink} target="_blank" rel="noreferrer" className="text-blue-600 underline text-sm mt-1 inline-block">View Location</a>
+        </div>,
+        { duration: 15000, position: "top-center" }
+      );
+    };
+
+    socket.on("emergency_notification", handleEmergency);
+    return () => socket.off("emergency_notification", handleEmergency);
+  }, [socket]);
 
   if (isCheckingAuth) return <PageLoader />;
 
