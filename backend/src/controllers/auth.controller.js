@@ -122,3 +122,39 @@ export const updateProfile = async (req, res) =>{
         res.status(500).json({message:"Internal server error"});
     }
 };
+
+export const addTrustedContact = async (req, res) => {
+    try {
+        const { contactId } = req.body;
+        const userId = req.user._id;
+
+        if(!contactId) return res.status(400).json({message:"Contact ID is required"});
+
+        const targetUser = await User.findById(contactId);
+        if(!targetUser) return res.status(404).json({message:"User not found"});
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $addToSet: { trustedContacts: contactId } },
+            { new: true }
+        ).populate("trustedContacts", "-password");
+
+        res.status(200).json(updatedUser.trustedContacts);
+    } catch (error) {
+        console.log("Error in addTrustedContact:", error);
+        res.status(500).json({message:"Internal server error"});
+    }
+};
+
+export const getTrustedContacts = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const user = await User.findById(userId).populate("trustedContacts", "-password");
+        if(!user) return res.status(404).json({message:"User not found"});
+        
+        res.status(200).json(user.trustedContacts);
+    } catch (error) {
+        console.log("Error in getTrustedContacts:", error);
+        res.status(500).json({message:"Internal server error"});
+    }
+};

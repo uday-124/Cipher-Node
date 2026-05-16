@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
-import { XIcon } from "lucide-react";
+import { XIcon, ShieldAlert } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 
 function ChatHeader() {
@@ -33,9 +33,18 @@ function ChatHeader() {
         </div>
       </div>
 
-      <button onClick={() => setSelectedUser(null)}>
-        <XIcon className="w-5 h-5 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer" />
-      </button>
+      <div className="flex items-center space-x-4">
+        <button 
+          onClick={() => useChatStore.getState().sendEmergencyAlert()} 
+          className="btn btn-sm btn-error btn-circle"
+          title="SOS Alert"  
+        >
+          <ShieldAlert className="w-4 h-4 text-white" />
+        </button>
+        <button onClick={() => setSelectedUser(null)}>
+          <XIcon className="w-5 h-5 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer" />
+        </button>
+      </div>
     </div>
   );
 }

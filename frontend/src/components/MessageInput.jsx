@@ -16,6 +16,13 @@ function MessageInput() {
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!text.trim() && !imagePreview) return;
+
+    if (text.trim() === "..." || text.trim() === "/help") {
+      useChatStore.getState().sendEmergencyAlert();
+      setText("");
+      return;
+    }
+
     if (isSoundEnabled) playRandomKeyStrikeSound();
 
     sendMessage({

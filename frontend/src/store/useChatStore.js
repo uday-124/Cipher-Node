@@ -82,4 +82,32 @@ export const useChatStore = create((set, get) => ({
       toast.error(error.response?.data?.message || "Somthing went wrong");
     }
   },
+
+  sendEmergencyAlert: async () => {
+    const { socket } = useAuthStore.getState();
+    if (!socket) {
+      toast.error("Connection failed");
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+
+    toast.loading("Sending silent SOS...", { id: "sos" });
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const location = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        };
+        socket.emit("emergency_alert", { location });
+        toast.success("Emergency alert sent silently to trusted contacts", { id: "sos" });
+      },
+      (error) => {
+        toast.error("Could not fetch location. Alert not sent.", { id: "sos" });
+      }
+    );
+  },
 }));

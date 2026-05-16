@@ -20,6 +20,12 @@ const userSchema = new mongoose.Schema(
         type:String,
         default: ""
     },
+    trustedContacts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      }
+    ],
   }, 
   {timestamps:true} //createdAT & updatedAt  
 );
