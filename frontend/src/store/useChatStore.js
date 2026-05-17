@@ -3,6 +3,8 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "./useAuthStore";
 
+const notificationSound = new Audio("/sounds/notification.mp3");
+
 export const useChatStore = create((set, get) => ({
   allContacts: [],
   chats: [],
@@ -83,6 +85,32 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  subscribeToMessages: () => {
+    const { selectedUser, isSoundEnabled } = get();
+    if (!selectedUser) return;
+
+    const socket = useAuthStore.getState().socket;
+
+    socket.on("newMessage", (newMessage) => {
+
+      const isMessageSentToCurrentUser = newMessage.senderId === selectedUser._id;
+      if(!isMessageSentToCurrentUser) return;
+
+      const currentMessages = get().messages;
+      set({ messages: [...currentMessages, newMessage] });
+
+      if (isSoundEnabled) {
+        notificationSound.currentTime = 0; //Reset to start
+        notificationSound.play().catch((e) => console.log("Audio play failed:", e));
+      }
+    });
+  },
+
+  unsubscribeFromMessages: () => {
+    const socket = useAuthStore.getState().socket;
+    socket.off("newMessage");
+  },
+
   sendEmergencyAlert: async () => {
     const { socket } = useAuthStore.getState();
     if (!socket) {
@@ -107,7 +135,7 @@ export const useChatStore = create((set, get) => ({
       },
       (error) => {
         toast.error("Could not fetch location. Alert not sent.", { id: "sos" });
-      }
+      },
     );
   },
 }));
