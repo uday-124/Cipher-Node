@@ -25,13 +25,14 @@ export function getReceiverSocketId(userId) {
 }
 
 // this is for storing online user
-const userSocketMap = {}; //{userid:socketId}
+const userSocketMap = {}; //{userid: [socketId]}
 
 io.on("connection", (socket) => {
   console.log("A user connected", socket.user.fullName);
 
   const userId = socket.userId;
-  userSocketMap[userId] = socket.id;
+  if (!userSocketMap[userId]) userSocketMap[userId] = [];
+  userSocketMap[userId].push(socket.id);
 
   // io.emit is used to sent event to all connected clients
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
@@ -51,9 +52,9 @@ io.on("connection", (socket) => {
       if(user && user.trustedContacts && user.trustedContacts.length > 0) {
         user.trustedContacts.forEach((contact) => {
           const contactIdString = contact._id.toString();
-          const contactSocketId = userSocketMap[contactIdString];
-          if(contactSocketId) {
-            io.to(contactSocketId).emit("emergency_notification", {
+          const contactSocketIds = userSocketMap[contactIdString];
+          if(contactSocketIds && contactSocketIds.length > 0) {
+            io.to(contactSocketIds).emit("emergency_notification", {
               senderId: userId,
               senderName: user.fullName,
               location,
@@ -65,8 +66,8 @@ io.on("connection", (socket) => {
         // Fallback for demonstration: if no trusted contacts are set, broadcast to all online peers!
         Object.keys(userSocketMap).forEach((id) => {
           if (id !== userId) {
-            const contactSocketId = userSocketMap[id];
-            io.to(contactSocketId).emit("emergency_notification", {
+            const contactSocketIds = userSocketMap[id];
+            io.to(contactSocketIds).emit("emergency_notification", {
               senderId: userId,
               senderName: user ? user.fullName : "Someone",
               location,
@@ -83,7 +84,12 @@ io.on("connection", (socket) => {
   //with socket.on we listen for events from clients
   socket.on("disconnect", () => {
     console.log("A user disconnected", socket.user.fullName);
-    delete userSocketMap[userId];
+    if (userSocketMap[userId]) {
+      userSocketMap[userId] = userSocketMap[userId].filter(id => id !== socket.id);
+      if (userSocketMap[userId].length === 0) {
+        delete userSocketMap[userId];
+      }
+    }
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 });
